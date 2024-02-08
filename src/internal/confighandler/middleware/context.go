@@ -23,7 +23,7 @@ func init() {
 	var config *rest.Config
 
 	if _, ok := os.LookupEnv("KUBERNETES_SERVICE_HOST"); !ok {
-		if config, err = cruntimeconfig.GetConfig(); err!=nil{
+		if config, err = cruntimeconfig.GetConfig(); err != nil {
 			panic(err)
 		}
 	} else {
@@ -44,18 +44,22 @@ func init() {
 
 func InvokeContext(writer http.ResponseWriter, request *http.Request) (*model.Context, error) {
 
-	data, err := ioutil.ReadAll(request.Body)
-	if err != nil {
-		http.Error(writer, fmt.Sprintf("Error formatting JSON: %w", err), http.StatusBadRequest)
-		return nil, err
-	}
-	json.Unmarshal(data, &request)
 	var prettyJSON bytes.Buffer
-	if err := json.Indent(&prettyJSON, data, "", "  "); err != nil {
-		http.Error(writer, fmt.Sprintf("Error formatting JSON: %w", err), http.StatusBadRequest)
-		return nil, err
-	}
 
+	if request.Method == http.MethodPatch ||
+		request.Method == http.MethodPut ||
+		request.Method == http.MethodPost {
+		data, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			http.Error(writer, fmt.Sprintf("Error formatting JSON: %w", err), http.StatusBadRequest)
+			return nil, err
+		}
+		json.Unmarshal(data, &request)
+		if err := json.Indent(&prettyJSON, data, "", "  "); err != nil {
+			http.Error(writer, fmt.Sprintf("Error formatting JSON: %w", err), http.StatusBadRequest)
+			return nil, err
+		}
+	}
 	return &model.Context{
 		Writer:       writer,
 		Request:      request,
