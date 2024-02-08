@@ -6,13 +6,14 @@ COPY . .
 
 WORKDIR /app/src
 
-RUN go build -o moperator
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/apiserver
 
-FROM alpine:latest
+# FROM gcr.io/distroless/base-debian12 AS build-release-stage
 
-WORKDIR /app
+# WORKDIR /
 
-COPY --from=builder /app/src/moperator /app/moperator
+# COPY --from=builder /app/apiserver /apiserver
+
 EXPOSE 8080
 
-CMD ["./moperator"]
+CMD [ "/app/apiserver" ]

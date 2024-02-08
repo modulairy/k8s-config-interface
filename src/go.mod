@@ -1,4 +1,4 @@
-module modulairy/operator
+module github.com/modulairy/k8s-configmap-api-server
 
 go 1.22.0
 
