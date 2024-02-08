@@ -1,18 +1,16 @@
-FROM golang:1.22 AS builder
+FROM golang:1.22.0-alpine3.19 AS builder
 
-WORKDIR /app
-
-COPY . .
+COPY . /app/.
 
 WORKDIR /app/src
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app/apiserver
+RUN go build -o /app/apiserver
 
-# FROM gcr.io/distroless/base-debian12 AS build-release-stage
+FROM alpine:3.19.1 AS build-release-stage
 
-# WORKDIR /
+WORKDIR /
 
-# COPY --from=builder /app/apiserver /apiserver
+COPY --from=builder /app/apiserver /app/apiserver
 
 EXPOSE 8080
 

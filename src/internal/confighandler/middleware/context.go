@@ -23,11 +23,17 @@ func init() {
 	var config *rest.Config
 
 	if _, ok := os.LookupEnv("KUBERNETES_SERVICE_HOST"); !ok {
-		config = cruntimeconfig.GetConfigOrDie()
+		if config, err = cruntimeconfig.GetConfig(); err!=nil{
+			panic(err)
+		}
 	} else {
 		if config, err = rest.InClusterConfig(); err != nil {
 			panic(err)
 		}
+	}
+
+	if config == nil {
+		panic("config is not found.")
 	}
 
 	if clientSet, err = kubernetes.NewForConfig(config); err != nil {
